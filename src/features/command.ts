@@ -1,0 +1,71 @@
+import { App } from '@slack/bolt'
+import { ComposerModal, ComposerModalProps } from '../blocks'
+import * as utils from '../utils'
+import { ConversationsInfoResult, FullMessageAttachment, UsersInfoResult } from '../utils/slack'
+
+export default (app: App) => {
+    app.command('/wolf', async ({ ack, client, command }) => {
+        await ack()
+
+        // Pre-populate the modal with sensible defaults
+        const props: ComposerModalProps = {
+            conversation: command.channel_id,
+            date: new Date().toISOString().slice(0, 10) // Only keep the date
+        }
+        await client.views.open({
+            trigger_id: command.trigger_id,
+            view: ComposerModal(props)
+        })
+    })
+
+    app.view('composer', async ({ ack, body, client, view }) => {
+        await ack()
+
+        // Extract state values
+        const {
+            conversation_input,
+            date_input,
+            message_input,
+            message_type_input,
+            user_input
+        } = view.state.values
+        const selectedConversation = conversation_input.select_conversation.selected_conversation
+        const selectedDate = date_input.select_date.selected_date
+        const inputMessage = message_input.input_message.value
+        const selectedMessageType = message_type_input.select_message_type.selected_option.value
+        const selectedUser = user_input.select_user.selected_user
+
+        // Get relevant info
+        const [{ channel }, { user }] = await Promise.all([
+            client.conversations.info({ channel: selectedConversation }) as Promise<ConversationsInfoResult>,
+            client.users.info({ user: selectedUser }) as Promise<UsersInfoResult>
+        ])
+
+        const ts = new Date(selectedDate).getTime() / 1000 // TODO: Fix dates being off by one day
+        const messageUrl = utils.getUrl(body.team.domain, selectedConversation, ts.toString())
+        const wolfMessage: FullMessageAttachment = {
+            author_icon: user.profile.image_48,
+            author_id: user.id,
+            author_link: utils.getAuthorLink(body.team.domain, user.id),
+            author_name: user.profile.display_name || user.profile.real_name,
+            author_subname: user.profile.display_name || user.profile.real_name,
+            channel_id: selectedConversation,
+            channel_name: channel.name,
+            color: 'D0D0D0',
+            fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage),
+            footer: `${selectedMessageType === 'message' ? 'Posted' : 'From a thread'} in #${channel.name}`,
+            from_url: messageUrl,
+            mrkdwn_in: ['text'],
+            original_url: messageUrl,
+            text: utils.removeSpecialTags(inputMessage),
+            ts: ts.toString(),
+        }
+
+        await client.chat.postMessage({
+            channel: selectedConversation,
+            user: body.user.id,
+            text: '',
+            attachments: [wolfMessage]
+        })
+    })
+}
