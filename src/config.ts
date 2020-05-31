@@ -1,7 +1,7 @@
 interface WolfConfig {
     databaseUrl: string
-    port: number | string,
-    botToken: string,
+    port: number | string
+    botToken: string
     signingSecret: string
 }
 
