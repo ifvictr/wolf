@@ -44,6 +44,7 @@ export default (app: App) => {
                 client.users.info({ user: selectedUser }) as Promise<UsersInfoResult>
             ])
 
+            const signature = ` (Sent via Wolf by <@${body.user.id}>)`
             const ts = new Date(selectedDate).getTime() / 1000 // TODO: Fix dates being off by one day
             const messageUrl = utils.getUrl(body.team.domain, sourceConversation, ts.toString())
             const wolfMessage: FullMessageAttachment = {
@@ -55,7 +56,7 @@ export default (app: App) => {
                 channel_id: sourceConversation,
                 channel_name: channel.name,
                 color: 'D0D0D0',
-                fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage),
+                fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage) + signature,
                 footer: `${selectedMessageType === 'message' ? 'Posted' : 'From a thread'} in #${channel.name}`,
                 from_url: messageUrl,
                 mrkdwn_in: ['text'],
