@@ -22,7 +22,7 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
             block_id: 'message_input',
             label: {
                 type: 'plain_text',
-                text: 'What do you want to say?'
+                text: ':microphone: What do you want to say?'
             },
             element: {
                 type: 'plain_text_input',
@@ -39,7 +39,7 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
             block_id: 'user_input',
             label: {
                 type: 'plain_text',
-                text: ':bust_in_silhouette: Who should this be said as?'
+                text: ':bust_in_silhouette: Who should say this?'
             },
             element: {
                 type: 'users_select',
@@ -55,7 +55,7 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
             block_id: 'date_input',
             label: {
                 type: 'plain_text',
-                text: ':calendar: When should it have been sent?'
+                text: ':calendar: When did (or will) they send it?'
             },
             element: {
                 type: 'datepicker',
@@ -69,14 +69,32 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
         },
         {
             type: 'input',
-            block_id: 'conversation_input',
+            block_id: 'source_conversation_input',
             label: {
                 type: 'plain_text',
-                text: ':round_pushpin: Which conversation should this be from?'
+                text: ':arrow_up: Which conversation should this message be from?'
             },
             element: {
                 type: 'conversations_select',
-                action_id: 'select_conversation',
+                action_id: 'select_source_conversation',
+                placeholder: {
+                    type: 'plain_text',
+                    text: 'Select a conversation'
+                },
+                initial_conversation: props?.conversation
+                // default_to_current_conversation: true
+            }
+        },
+        {
+            type: 'input',
+            block_id: 'destination_conversation_input',
+            label: {
+                type: 'plain_text',
+                text: ':arrow_right: Where should this message be shared to?'
+            },
+            element: {
+                type: 'conversations_select',
+                action_id: 'select_destination_conversation',
                 placeholder: {
                     type: 'plain_text',
                     text: 'Select a conversation'
@@ -90,7 +108,7 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
             block_id: 'message_type_input',
             label: {
                 type: 'plain_text',
-                text: ':speech_balloon: What type of message will this be?'
+                text: ':speech_balloon: What type of message should this show up as?'
             },
             element: {
                 type: 'static_select',
