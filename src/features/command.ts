@@ -1,5 +1,6 @@
 import { App } from '@slack/bolt'
-import { ComposerModal, ComposerModalProps } from '../blocks'
+import { ComposerModal, ComposerModalProps, Disclaimer } from '../blocks'
+import config from '../config'
 import * as utils from '../utils'
 import { ConversationsInfoResult, FullMessageAttachment, UsersInfoResult } from '../utils/slack'
 
@@ -69,7 +70,13 @@ export default (app: App) => {
                 channel: destinationConversation,
                 user: body.user.id,
                 text: '',
-                attachments: [wolfMessage]
+                attachments: [
+                    wolfMessage,
+                    // Optionally include disclaimers
+                    ...config.enableDisclaimers
+                        ? [{ blocks: [Disclaimer()] }]
+                        : []
+                ]
             })
         } catch (e) {
             await client.chat.postEphemeral({
