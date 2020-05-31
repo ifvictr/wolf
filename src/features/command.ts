@@ -37,37 +37,45 @@ export default (app: App) => {
         const selectedMessageType = message_type_input.select_message_type.selected_option.value
         const selectedUser = user_input.select_user.selected_user
 
-        // Get relevant info
-        const [{ channel }, { user }] = await Promise.all([
-            client.conversations.info({ channel: sourceConversation }) as Promise<ConversationsInfoResult>,
-            client.users.info({ user: selectedUser }) as Promise<UsersInfoResult>
-        ])
+        try {
+            // Get relevant info
+            const [{ channel }, { user }] = await Promise.all([
+                client.conversations.info({ channel: sourceConversation }) as Promise<ConversationsInfoResult>,
+                client.users.info({ user: selectedUser }) as Promise<UsersInfoResult>
+            ])
 
-        const ts = new Date(selectedDate).getTime() / 1000 // TODO: Fix dates being off by one day
-        const messageUrl = utils.getUrl(body.team.domain, sourceConversation, ts.toString())
-        const wolfMessage: FullMessageAttachment = {
-            author_icon: user.profile.image_48,
-            author_id: user.id,
-            author_link: utils.getAuthorLink(body.team.domain, user.id),
-            author_name: user.profile.display_name || user.profile.real_name,
-            author_subname: user.profile.display_name || user.profile.real_name,
-            channel_id: sourceConversation,
-            channel_name: channel.name,
-            color: 'D0D0D0',
-            fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage),
-            footer: `${selectedMessageType === 'message' ? 'Posted' : 'From a thread'} in #${channel.name}`,
-            from_url: messageUrl,
-            mrkdwn_in: ['text'],
-            original_url: messageUrl,
-            text: utils.removeSpecialTags(inputMessage),
-            ts: ts.toString(),
+            const ts = new Date(selectedDate).getTime() / 1000 // TODO: Fix dates being off by one day
+            const messageUrl = utils.getUrl(body.team.domain, sourceConversation, ts.toString())
+            const wolfMessage: FullMessageAttachment = {
+                author_icon: user.profile.image_48,
+                author_id: user.id,
+                author_link: utils.getAuthorLink(body.team.domain, user.id),
+                author_name: user.profile.display_name || user.profile.real_name,
+                author_subname: user.profile.display_name || user.profile.real_name,
+                channel_id: sourceConversation,
+                channel_name: channel.name,
+                color: 'D0D0D0',
+                fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage),
+                footer: `${selectedMessageType === 'message' ? 'Posted' : 'From a thread'} in #${channel.name}`,
+                from_url: messageUrl,
+                mrkdwn_in: ['text'],
+                original_url: messageUrl,
+                text: utils.removeSpecialTags(inputMessage),
+                ts: ts.toString(),
+            }
+
+            await client.chat.postMessage({
+                channel: destinationConversation,
+                user: body.user.id,
+                text: '',
+                attachments: [wolfMessage]
+            })
+        } catch (e) {
+            await client.chat.postEphemeral({
+                channel: destinationConversation,
+                user: body.user.id,
+                text: `Failed to send. Reason: \`${e.data.error}\``
+            })
         }
-
-        await client.chat.postMessage({
-            channel: destinationConversation,
-            user: body.user.id,
-            text: '',
-            attachments: [wolfMessage]
-        })
     })
 }
