@@ -69,14 +69,32 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
         },
         {
             type: 'input',
-            block_id: 'conversation_input',
+            block_id: 'source_conversation_input',
             label: {
                 type: 'plain_text',
                 text: ':round_pushpin: Which conversation should this be from?'
             },
             element: {
                 type: 'conversations_select',
-                action_id: 'select_conversation',
+                action_id: 'select_source_conversation',
+                placeholder: {
+                    type: 'plain_text',
+                    text: 'Select a conversation'
+                },
+                initial_conversation: props?.conversation
+                // default_to_current_conversation: true
+            }
+        },
+        {
+            type: 'input',
+            block_id: 'destination_conversation_input',
+            label: {
+                type: 'plain_text',
+                text: ':dart: Which conversation should this be shared to?'
+            },
+            element: {
+                type: 'conversations_select',
+                action_id: 'select_destination_conversation',
                 placeholder: {
                     type: 'plain_text',
                     text: 'Select a conversation'
