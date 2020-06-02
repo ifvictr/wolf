@@ -10,7 +10,7 @@ export const ComposerModal = (props?: ComposerModalProps): View => ({
     callback_id: 'composer',
     title: {
         type: 'plain_text',
-        text: 'Wolf'
+        text: 'Compose a message'
     },
     submit: {
         type: 'plain_text',
