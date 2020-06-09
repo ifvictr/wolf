@@ -1,8 +1,9 @@
 import { App } from '@slack/bolt'
+import { MessageAttachment } from '@slack/types'
 import { ComposerModal, ComposerModalProps, Disclaimer } from '../blocks'
 import config from '../config'
 import * as utils from '../utils'
-import { ConversationsInfoResult, FullMessageAttachment, UsersInfoResult } from '../utils/slack'
+import { ConversationsInfoResult, UsersInfoResult } from '../utils/slack'
 
 export default (app: App) => {
     app.command('/wolf', async ({ ack, client, command }) => {
@@ -47,21 +48,14 @@ export default (app: App) => {
 
             const signature = ` (Sent via Wolf by <@${body.user.id}>)`
             const ts = new Date(selectedDate).getTime() / 1000 // TODO: Fix dates being off by one day
-            const messageUrl = utils.getUrl(body.team.domain, sourceConversation, ts.toString())
-            const wolfMessage: FullMessageAttachment = {
+            const wolfMessage: MessageAttachment = {
                 author_icon: user.profile.image_48,
-                author_id: user.id,
                 author_link: utils.getAuthorLink(body.team.domain, user.id),
                 author_name: user.profile.display_name || user.profile.real_name,
-                author_subname: user.profile.display_name || user.profile.real_name,
-                channel_id: sourceConversation,
-                channel_name: channel.name,
                 color: 'D0D0D0',
                 fallback: utils.getFallbackText(ts.toString(), user.name, inputMessage) + signature,
                 footer: `${selectedMessageType === 'message' ? 'Posted' : 'From a thread'} in #${channel.name}`,
-                from_url: messageUrl,
                 mrkdwn_in: ['text'],
-                original_url: messageUrl,
                 text: utils.removeSpecialTags(inputMessage),
                 ts: ts.toString(),
             }
