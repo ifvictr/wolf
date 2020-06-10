@@ -1,4 +1,4 @@
-# Wolf 🐺
+# 🐺 Wolf
 
 Effortlessly compose fictitious Slack messages.
 
