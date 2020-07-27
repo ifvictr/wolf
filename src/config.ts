@@ -1,4 +1,4 @@
-interface WolfConfig {
+interface Config {
     databaseUrl: string
     port: number | string
     signingSecret: string
@@ -8,7 +8,7 @@ interface WolfConfig {
     enableDisclaimers: boolean
 }
 
-const config: WolfConfig = {
+const config: Config = {
     databaseUrl: process.env.DATABASE_URL || process.env.MONGODB_URI || '',
     port: process.env.PORT || 3000,
     // Slack-specific config
