@@ -11,4 +11,4 @@ export const getFallbackText = (
 export const removeSpecialTags = (str: string): string =>
   str
     .replace(/@(channel|everyone|here)/gi, '@\u200c$1')
-    .replace(/\<\!(channel|everyone|here)\|(.*?)\>/gi, '<\u200c!$1|$2>')
+    .replace(/<!(channel|everyone|here)\|(.*?)>/gi, '<\u200c!$1|$2>')
